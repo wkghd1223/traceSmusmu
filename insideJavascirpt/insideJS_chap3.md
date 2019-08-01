@@ -43,7 +43,7 @@ __undefined는 타입이자 값을 나타낸다.__
 
 자바스크립트에서 객체는 'key:value'를 저장하는 컨테이너이다.
 <br>
-기본다입은 하나의 값만을 가지는데 객체는 여러개의 프로퍼티를 포함할 수 있고 그 프로퍼티는 기본 타입이거나 참조 타입일 수 있다.
+기본타입은 하나의 값만을 가지는데 객체는 여러개의 프로퍼티를 포함할 수 있고 그 프로퍼티는 기본 타입이거나 참조 타입일 수 있다.
 <br>
 이러한 성질로 객체의 프로퍼티는 함수도 포함할 수 있으며 자바스크립트에서 이러한 함수를 메소드라고한다.
 
@@ -177,4 +177,58 @@ delete 연산자로 프로퍼티를 삭제할 수 있다. 단 delete 연산자�
 foo객체에 \_\_proto\_\_ 프로퍼티가 있는 것을 확인 할 수 있다. 이 프로퍼티가 foo객체의 부모인 __프로토 타입 객체__ 이다.
 > ECMAScript 에서는 크롬 브라우저의 \_\_proto\_\_프로퍼티를 [[Prototype]]으로 명시한다.
 
-\_\_proto\_\_프로퍼티가 가리키는 객체는 Object.prototype이고 이 객체는 toString(), valueOf()등의 내장 메소드를 포함한다.
+\_\_proto\_\_프로퍼티가 가리키는 객체는 Object.prototype이고 이 객체는 toString(), valueOf()등의 내장 메소드를 포함한다. <br>
+(리터럴방식으로 생성된 객체의 경우 Object.prototype 객체가 프로토타입 객체가 된다.)
+
+
+객체를 생성할 때 결정된 프로토타입 객체는 임의의 다른 객체로 변경하는 것이 가능하다(부모의 객체를 바꾸는 것이 가능. 자바스크립트는 이것으로 상속을 구현한다).
+
+## 5. 배열
+자바스크립트에서 배열은 특별한 형태의 객체이다. 어느위치에 어느타입의 데이터를 저장해도 문제가 없다.
+
+### 5.1. 배열 리터럴
+새로운 배열을 만드는데 사용하는 표기법이다. 대괄호를 사용하여 표현한다.
+
+    var colorArr = ['orrange', 'blue', 'green', 'red'];
+
+객체 리터럴은 key: value의 페어를 모두 표함해야하지만 배열리터럴은 각 요소의 값만을 포함한다.
+
+### 5.2. 배열의 요소 생성
+자바스크립트의 배열의 경우 값을 순차적으로 넣을 필요없이 아무 위치에나 값을 추가할 수 있다.
+
+    var emptyArr = [];
+    console.log(emptyArr[0]); // (출력값) undefined
+    
+    emptyArr[0] = 100;
+    emptyArr[3] = 'eight';
+    emptyArr[5] = true;
+    console.log(emptyArr);
+    // (출력값) [100, undefined, undefined, "eight", undefined, true]
+    console.log(emptyArr.lenght); // (출력값) 6
+
+### 5.3. 배열의 lenght 프로퍼티
+모든 배열은 lenght프로퍼티를 가진다. __lenght 프로퍼티는 배열 내 가장 큰 인텍스에 1을 더한 값이다.__ 
+
+    var arr = [];
+    arr[0] = 0;
+    arr[1] = 1;
+    arr[4] = 4;
+    console.log(arr.lenght); // (출력값) 5
+---
+    arr.lenght = 7;
+    console.log(arr);
+    // (출력값) [0, 1, undefined, undefined, 4, undefined, undefined]
+---
+    arr.lenght = 2;
+    console.log(arr) // (출력값) [0, 1]
+> lenght 프로퍼티의 범위를 벗어나는 실제 값은 삭제된다.
+
+#### 5.3.1. 배열의 표준 메소드와 lenght 프로퍼티
+자바스크립트의 배열에서는 __lenght 프로퍼티를 기반__ 으로 하는 다양한 표준 메소드가 있다.
+<br>
+예를 들어 push() 함수의 경우
+<br>
+![Alt text](./img/push_method.PNG "");
+
+### 5.4. 배열과 객체
+자바스크립트에서는 배열도 객체이다.
