@@ -232,3 +232,147 @@ foo객체에 \_\_proto\_\_ 프로퍼티가 있는 것을 확인 할 수 있다. 
 
 ### 5.4. 배열과 객체
 자바스크립트에서는 배열도 객체이다.
+
+    var colorsArray = ['orange', 'yellow', 'green'];
+    console.log(colorsArray[0]+" "+colorsArray[1]+" "colorsArray[2]);
+    // (출력값) orange yellow green
+
+    var colorsObj = {
+        '0': 'orange',
+        '1': 'yellow',
+        '2': 'green'
+    }
+    console.log(colorsObj[0]+" "+colorsObj[1]+" "colorsObj[2]);
+    // (출력값) orange yellow green
+
+> colorsObj['0']이 아니라 colorsObj[0]을 써도 되는 이유 :
+<br>
+자바스크립트 엔진에서 []연산자 안에 숫자가 사용될 경우 자동으로 문자로 바꾸어준다.
+
+typeof 연산자 비교
+
+    console.log(typeof colorsArray); // (출력값) object
+    console.log(typeof colorsObj); (출력값) object
+
+배열도 객체이기 때문에 배열의 타입은 객체이다.
+
+length 프로퍼티
+
+    console.log(typeof colorsArray.length); // (출력값) 3
+    console.log(typeof colorsObj.length); (출력값) undefined
+
+객체는 기본적으로 length프로퍼티가 없기 때문에 undefined라는 결과가 나온다.
+
+배열 표준 메소드
+
+    typeof colorsArray.push('red');
+    typeof colorsObj.push('red'); // Uncaught TypeError #~~
+
+배열의 prototype객체는 Array.prorotype 객체인데 이 객체는 push()라는 기본 메소드를 갖는다. 그에반해 그냥 객체인 colorsObj 의 프로토타입인 Object.prototype은 기본 내장 메소드로 push()를 갖고있지 않아 에러가 발생한다.
+> Array.prototype의 prototype객체는 Object.prototype이다.
+
+### 5.5. 배열의 프로퍼티 동적 생성
+배열도 객체이므로 인덱스가 숫자인 배열 원소 이외에도 프로퍼티를 추가할 수 있다(length에는 변화 없음).
+
+    var arr = ['zero', 'one', 'two'];
+    console.log(arr.lenth); // (출력값) 3
+
+    arr.color = 'blue';
+    arr.name = 'number_array';
+    console.log(arr.lenth); // (출력값) 3
+
+### 5.6. 배열의 프로퍼티 열거
+배열도 객체이므로 for in 문으로 프로퍼티를 열거할 수 있지만 그렇게 되면 불필요한 프로퍼티까지 모두 나올 수 있으므로 될 수 있으면 for 문을 사용한다.
+
+### 5.7. 배열 요소 삭제
+배열도 객체이므로 delete연산자를 사용할 수 있다. 그러나 delete를 사용한 삭제는 진정한 삭제가 아닌 원래의 원소를 undefined로 설정하는 것이다. 그러므로 배열에서 진정한 원소의 삭제를 위해선 __splice()__ 를 사용한다.
+> _splice()_ 메소드
+<br>
+splice(start, deleteCount, item...)
+<br>
+start : 배열의 시작위치
+<br>
+deleteCount : start에서 지정한 시작 위치부터 삭제할 요소의 수
+<br>
+item 삭제할 위치에 추가할 요소
+
+### 5.8. Array() 생성자 함수
+_new_ 키워드를 이용하여 코드 작성을 하는데 Array() 생성자 함수는 인자 개수에 따라 동작이 다르다.
+* 호출할 때 인자가 1개이고 숫자일 경우 : 호출된 인자를 length로 갖는 빈 배열 생성
+* 그 외의 경우 : 호출된 인자를 요소로 갖는 배열 생성
+---
+    var foo = new Array(3);
+    console.log(foo); // (출력값) [undefined, undefined, undefined]
+    console.log(foo.length); // (출력값) 3
+
+    var foo = new Array(1, 2, 3);
+    console.log(foo); // (출력값) [1, 2, 3]
+    console.log(foo.length); // (출력값) 3
+
+### 5.9. 유사 배열 객체 
+배열에서 length는 배열의 동작에 있어 중요한 프로퍼티이다. 자바스크립트에서 일반적인 객체에 length라는 프로퍼티가 있으면 그 것을 __유사 배열 객체(array-like object)__ 라고 한다.
+<br>
+이 유사 배열 객체의 가장 큰 특징은 표준 배열 메소드를 사용하는 것이 가능하다는 점이다.
+
+    var arr = ['bar'];
+    var obj = {
+        name : 'foo'
+        length : 1
+    }
+
+    arr.push('baz');
+    obj.push('baz'); // (출력값) error
+
+이 경우 obj는 객체이지만 length라는 프로퍼티를 가지고 있다. 그리고 _push()_ 라는 표준 배열 메소드를 사용했는데 당연히 객체이기 때문에 _push()_ 메소드를 사용할 수 없어 error가 발생한다. 유사 배열 객체의 경우 ___apply()___ 메소드를 이용하면 표준 배열 메소드를 사용 하는 것이 가능하다.
+
+    Array.prototype.push.apply(obj, ['baz']);
+    console.log(obj); // (출력값) { '1': 'baz', name: 'foo', length: 2}
+
+> __arguments__ 객체나 __jQuery__ 객체가 유사 배열 객체이다. 더 자세한것은 4장에서 배운다.
+
+## 6. 기본 타입과 표준 메소드
+자바스크립트는 기본타입에 대해 타입별로 호출가능한 표준 메소드를 정의해 놓았다. 기본타입은 객체가 아니기 때문에 원래는 메소드를 호출 할 수 없는데 객체형태로 메소드를 호출할 경우 자동으로 기본타입은 객체로 변환되고 메소드를 호출한 다음 다시 기본타입으로 전환된다.
+
+## 7. 연산자
+대부분 다른 언어와 연산자가 유사하다.
+
+### 7.1. + 연산자
+* 더하기 연산
+* 문자열 연결 연산
+
+### 7.2. typeof 연산자
+피 연산자의 타입을 __문자열__ 형태로 리턴한다. null과 배열은 object타입, 함수는 function이라는 점을 유의해야 한다.
+<br>
+
+| 구분 | 타입 | 리턴 값|
+|---|---|---|
+기본 타입 | 숫자 | 'number'
+기본 타입 | 문자열 | 'string'
+기본 타입 | 불린 | 'boolean'
+기본 타입 | __null__ | __'object'__
+기본 타입 | undefined | 'undefined'
+참조 타입 | 객체 | 'object'
+참조 타입 | 배열 | 'object'
+참조 타입 | 함수 | 'function'
+
+### 7.3. ==(동등) 연산자와 ===(일치) 연산자
+* == : 타입이 다를 경우 타입변환을 거친 후 비교한다.
+* === : 타입변환을 거치지 않고 비교한다.
+
+### 7.4. !! 연산자
+!!의 역할은 피연산자를 불린값으로 변환하는 것이다.
+
+|피연산자| 값|
+|---|---|
+|!!0|false|
+|!!1| true|
+|!!'string'|true|
+|!!''|false|
+|!!true|true|
+|!!false|false|
+|!!null|false|
+|!!undefined|false|
+|!!{}|true|
+|!![]|true|
+
+객체는 값이 비어이써도 ture로 변환된다.
