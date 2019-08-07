@@ -193,5 +193,9 @@ prototype 프로퍼티는 함수가 생성될 때 만들어지며, 단지 ___con
 
 ![asdf](./img/__proto__and_constructor.PNG)
 
-* _myFunction.prototype_ 객체는 ___constructor___ 와 ___proto___ 라는 두 개의 프로퍼티가 있다. 이 객체는 _myFunction()_ 함수의 프로토타입 객체이므로 _constructor_ 프로퍼티가 있다. 또한 프로토타입 객체 역시 자바스크립트 객체이므로 자신의 부모 역할을 하는 prototype프로퍼티가 있다. 
+* _myFunction.prototype_ 객체는 ___constructor___ 와 ___\_\_proto\_\____ 라는 두 개의 프로퍼티가 있다. 이 객체는 _myFunction()_ 함수의 프로토타입 객체이므로 _constructor_ 프로퍼티가 있다. 또한 프로토타입 객체 역시 자바스크립트 객체이므로 자신의 부모 역할을 하는 prototype프로퍼티가 있다. 
 * _myFunction.prototype.constructor_ 의 값을 출력함으로써 프로토타입 객체와 매핑된 함수를 알아볼 수 있다. 결과값을 보면 _myFunction()_ 함수를 가리키고 있다.
+
+이렇듯 함수 객체와 프로토타입 객체는 서로 밀접하게 연결되어 있다.
+![relation_proto_constructor](./img/relation_between_prototype_and_constructor.PNG)
+
