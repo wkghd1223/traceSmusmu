@@ -155,7 +155,7 @@ ECMA5 스크립트 명세서에는 모든 함수가 length와 prototype프로퍼
 > __arguments 객체__
 > <br>ECMA표준에서는 arguments 프로퍼티와 이름이 같은 arguments객체를 정의하고 있다. arguments객체는 함수를 호출할 때 호출된 함수의 내부로 인자값과 함께 전달되며, arguments 프로퍼티와 유사하게 함수를 호출할 때 전달 인자값의 정보를 제공해 준다.
 
-* \_\_proto\_\_ : 함수 객체의 부모역할을 하는 객체를 가리킨다. ECMA표준에서는 함수 객체의 부모 역할을 하는 프로토타입 객체를 Function.prototype 객체라고 명명하고 이것 역시 __함수 객체__ 라고 정의한다.
+* _\_\_proto\_\__ : 함수 객체의 부모역할을 하는 객체를 가리킨다. ECMA표준에서는 함수 객체의 부모 역할을 하는 프로토타입 객체를 Function.prototype 객체라고 명명하고 이것 역시 __함수 객체__ 라고 정의한다.
 > 크롬 브라우저는 Function Prototype 객체를 ___Empty() 함수___ 라고 명하고 있다. _Empty()_ 함수가 가지는 프로퍼티와 메소드를 살펴보면 Function.prototype객체가 가지는 프로퍼티, 메소드를 가지는 것을 알 수 있다.
 >* _constructor_ 프로퍼티
 >* _toString()_ 메소드
@@ -166,3 +166,31 @@ ECMA5 스크립트 명세서에는 모든 함수가 length와 prototype프로퍼
 > Function.prototype객체의 프로토타입 객체는 Object.prototype객체이다.
 
 #### 2.3.1. length 프로퍼티
+length프로퍼티는 ECMAScript에서 정한 모든 함수가 가져야 하는 표준 프로퍼티로서, 함수가 실행될 때 기대되는 인자의 개수를 나타낸다.
+
+    function func0(){    };
+    function func1(x){    };
+
+    console.log(func0.length); // (출력값) 0
+    console.log(func1.length); // (출력값) 1
+
+#### 2.3.2. prototype 프로퍼티
+모든 함수는 객체로서 prototype 프로퍼티를 가지고 있다. 이것은 객체의 부모를 나타내는 내부 프로퍼티인 [[Prorotype]]과 혼동하지 말아야 한다.
+
+> prototype 프로퍼티와 [[Prototype]] 프로퍼티
+><br>두 프로퍼티 모두 프로토 타입객체를 가리킨다는 공토점이 있지만 관점에 차이가 있다. [[Prototype]]은 객체입장에서 자신의 부모 역할을 하는 프로토타입 객체를 가리키는 반면, prototype 프로퍼티는 이 함수가 생성자로 사용될 때 이 함수를 통해 생성된 객체의 부모역할을 하는 프로토타입 객체를 가리킨다.
+
+prototype 프로퍼티는 함수가 생성될 때 만들어지며, 단지 ___constructor_ 프로퍼티__ 하나만 있는 객체를 가리킨다. 그리고 prototype 프로퍼티가 가리키는 프로토타입 객체의 유일한 constructor 프로퍼티는 자신과 연결된 함수를 가리킨다. 
+<br>
+즉 자바스크립트는 함수를 생성할 때 함수 자신과 연결된 프로토타입 객체를 동시에 생성하며 이 둘은 다음 그림처럼 각각 prototype과 constructor라는 프로퍼티로 서로를 참조하게 된다.
+
+    function MyFunction(){
+        return true;
+    };
+
+    console.dir(myFunction.__proto__);
+    console.dir(myFunction.proto__.constructor);
+
+![asdf](./img/__proto__and_constructor.PNG)
+
+myFunction.\_\_proto\_\_ 객체는 ___constructor___ 와 ___\_\_proto\_\____ 라는 두 개의 프로퍼티가 있다. 이 객체는 _myFunction()_ 함수의 프로토타입 객체이므로 _constructor_ 프로퍼티가 있다.
