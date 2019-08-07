@@ -147,23 +147,22 @@ add()함수를 생성할 때 함수 코드는 [[Code]] 내부 프로퍼티에 �
 ![Alt text](./img/add_prototype_.PNG "")
 
 ECMA5 스크립트 명세서에는 모든 함수가 length와 prototype프로퍼티를 가져야 한다고 기술한다.
-우선 name, caller, arguments, \_\_proto\_\_프로퍼티를 살펴보자. 이들은 ECMA표준이 아니다.
+우선 _name_, _caller_, _arguments_, \_\_proto\_\_프로퍼티를 살펴보자. 이들은 ECMA표준이 아니다.
 <br>
-* name : 함수의 이름을 나타낸다.
-* caller : 자신을 호출한 함수를 나타낸다.
-* arguments : 함수를 호출할 때 전달된 인자값을 나타낸다.
+* _name_ : 함수의 이름을 나타낸다.
+* _caller_ : 자신을 호출한 함수를 나타낸다.
+* _arguments_ : 함수를 호출할 때 전달된 인자값을 나타낸다.
 > __arguments 객체__
-<br>
-ECMA표준에서는 arguments 프로퍼티와 이름이 같은 arguments객체를 정의하고 있다. arguments객체는 함수를 호출할 때 호출된 함수의 내부로 인자값과 함께 전달되며, arguments 프로퍼티와 유사하게 함수를 호출할 때 전달 인자값의 정보를 제공해 준다.
+> <br>ECMA표준에서는 arguments 프로퍼티와 이름이 같은 arguments객체를 정의하고 있다. arguments객체는 함수를 호출할 때 호출된 함수의 내부로 인자값과 함께 전달되며, arguments 프로퍼티와 유사하게 함수를 호출할 때 전달 인자값의 정보를 제공해 준다.
 
 * \_\_proto\_\_ : 함수 객체의 부모역할을 하는 객체를 가리킨다. ECMA표준에서는 함수 객체의 부모 역할을 하는 프로토타입 객체를 Function.prototype 객체라고 명명하고 이것 역시 __함수 객체__ 라고 정의한다.
-> 크롬 브라우저는 Function Prototype 객체를 __Empty() 함수__ 라고 명하고 있다. Empty() 함수가 가지는 프로퍼티와 메소드를 살펴보면 Function.prototype객체가 가지는 프로퍼티, 메소드를 가지는 것을 알 수 있다.
->* constructor 프로퍼티
->* toString() 메소드
->* apply(thisArg, argArray) 메소드
->* call(thisArg, [, arg1 [,arg2,]]) 메소드
->* bind(thisArg, [, arg1 [,arg2,]]) 메소드
-
+> 크롬 브라우저는 Function Prototype 객체를 ___Empty() 함수___ 라고 명하고 있다. _Empty()_ 함수가 가지는 프로퍼티와 메소드를 살펴보면 Function.prototype객체가 가지는 프로퍼티, 메소드를 가지는 것을 알 수 있다.
+>* _constructor_ 프로퍼티
+>* _toString()_ 메소드
+>* _apply(thisArg, argArray)_ 메소드
+>* _call(thisArg, [, arg1 [,arg2,]])_ 메소드
+>* _bind(thisArg, [, arg1 [,arg2,]])_ 메소드
+---
 > Function.prototype객체의 프로토타입 객체는 Object.prototype객체이다.
 
 #### 2.3.1. length 프로퍼티
