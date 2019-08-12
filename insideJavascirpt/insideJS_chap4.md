@@ -225,4 +225,169 @@ prototype 프로퍼티는 함수가 생성될 때 만들어지며, 단지 ___con
 >1. __var__(function-scoped) : 변수의 유효범위가 함수단위이다. 재선언이 가능하다.
 >2. __let, const__(blocked-scoped) : 변수의 유효범위가 블록단위이다. 재선언이 불가능하며 const의 경우 재할당도 불가능하다.
 
+### 3.3. 내부 함수
+자바스크립트는 함수 코드 내부에서도 다시 함수 정의가 가능하다. 내부 함수는 클로저 생성, 록립적인 헬퍼 함수 구현 등의 용도로 사용된다.
 
+    //parent()
+    function parent(){
+        var a = 100;
+        var b = 200;
+
+        function child(){
+            var b = 300;
+
+            console.log(a);
+            console.log(b);
+        }
+        child();
+    }
+    parent();
+    child();
+
+    // (출력값)
+    100
+    300
+    Uncaught Re ... not defined
+
+__스코프 체이닝__ 으로 인해 이 것이 가능하다. 자세한 내용은 5장에서 배우고 여기서는 __내부 함수는 자신을 둘러싼 외부 함수의 변수에 접근 가능하다__ 는 정도를 알면 된다. 반대로 내부 함수를 리턴하는 형태로 부모 함수 밖에서도 내부 함수를 호출하는 것이 가능하다.
+
+    function parent(){
+        var a = 100;
+        var child = function(){
+            console.log(a);
+        }
+
+        return child;
+    }
+
+    var inner = parent();
+    inner();
+    // (출력값) 100
+
+이와 같이 실행이 끝난 _parent()_ 와 같은 부모 함수 스코프의 변수를 참조하는 _inner()_ 와 같은 함수를 __클로저__ 라고 한다.
+
+### 3.4. 함수를 리턴하는 함수
+자바스크립트에서는 함수도 일급 객체이므로 함수 자체를 리턴하는 것이 가능하다.
+
+다음은 자신을 재정의 하는 함수이다.
+
+    var self = function () {
+        console.log('a');
+        return function () {
+            console.log('b');
+        }
+    }
+
+    self = self();  // a
+    self();         // b
+
+## 4. 함수 호출과 this
+
+### 4.1. arguments 객체
+C같은 언어와 달리 자바스크립트는 함수 형식에 맞추어 인자를 넣지 않아도 에러가 발생하지 않는다.
+
+    function func (arg1, arg2){
+        console.log(arg1, arg2);
+    }
+    func();         // (출력값) undefined undefined
+    func(1);        // (출력값) 1 undefined
+    func(1, 2);     // (출력값) 1 2
+    func(1, 2, 3);  // (출력값) 1 2
+
+이러한 자바스크립트의 특성 때문에 런타임 시에 호출된 인자의 개수를 확인하고 이에 따라 동작을 다르게 해줘야 할 경우가 있다. 이를 가능케 하는 게 바로 ___arguments__ 객체_ 이다. 자바스크립트에서는 함수를 호출할 때 자동으로 arguments 객체가 함수 내부로 전달되기 때문이다. arguments 객체는 함수를 호출할 때 넘긴 인자들이 배열 형태로 저장된 객체를 의미하는데 이 객체는 실제 배열이 아닌 유사 배열 객체이다.
+
+    function add(a, b) {
+        console.dir(arguments);
+        return a+b;
+    }
+    console.log(add(1));        // NaN
+    console.log(add(1, 2));     // 3
+    console.log(add(1, 2, 3));  // 3
+
+![asdf](./img/Object_arguments.PNG)
+
+arguments객체는 세 가지로 구성되어 있다.
+
+* 넘겨진 인자 : 첫 번째 인자는 0번 인덱스, 두 번째 인자는 1번 인덱스...
+* lenght 프로퍼티 : 호출할 때 넘겨진 인자의 개수를 의미한다.
+* callee 프로퍼티 : 현재 실행중인 함수의 참조값(여기서는 add())
+
+arguments객체는 매개변수 개수가 정확하게 정해지지 않은 함수를 구현하거나, 전달된 인자의 개수에 따라 서로 다른 처리를 해줘야 하는 함수를 개발하는 데 유용하게 사용할 수 있다.
+    function sum () {
+        var result = 0;
+
+        for(var i = 0; i < arguments.length; i++){
+            result += arguments[i];
+        }
+
+        return result;
+    }
+
+### 4.2. 호출 패턴과 this 바인딩
+
+#### 4.2.1. 객체의 메소드 호출할 때 this 바인딩
+객체의 프로퍼티가 함수인 경우 메소드라고 한다. 메소드를 호출할 대 메소드 내부 코드에서 사용된 this는 __해당 메소드를 호출한 객체로 바인딩__ 된다.
+
+    var myObject = {
+        name : 'foo',
+        sayName : function (){
+            console.log(this.name);
+        }
+    };
+    var otherObject = {
+        name : 'bar'
+    };
+
+    otherObject.sayName = myObject.sayName;
+
+    myObject.sayName();     // foo
+    otherObject.sayName();  // bar
+
+#### 4.2.2. 함수를 호출할 때 this 바인딩
+
+자바스크립트는 함수를 호출하면, 해당 함수 내부 코드에서 사용된 this는 전역 객체에 바인딩 된다.
+
+> 전역객체<br>
+> 모든 객체는 전역 객체의 프로퍼티이다.
+
+이런 this바인딩의 특성은 내부 함수를 호출했을 경우에도 그대로 적용되므로, 내부 함수에서 this를 이용할 때는 주의해야 한다.
+
+    var value = 100;
+    var myObj = {
+        value: 1,
+        func1 : function () {
+            this.value += 1;
+            console.log(this.value);
+
+            func2 = function () {
+                this.value += 1;
+                console.log(this.value);
+            }
+            func2();
+        }
+    }
+    // (출력값)
+    2
+    101
+
+이와 같은 현상은 내부 함수 호출 패턴을 정의해 놓지 않아서 생기는데 이를 해결하기 위해 __부모 함수의 _this___ 를 내부함수가 접근 가능한 __다른 변수에 저장__ 하는 방법이 사용된다. 이 변수의 이름은 관례상 that이라고 한다.
+
+    var value = 100;
+    var myObj = {
+        value: 1,
+        func1 : function(){
+            var that = this;
+            console.log(this.value);
+
+            func2 = function () {
+                that.value += 1;
+                console.log(that.value);
+            }
+            func2();
+        }
+    }
+    // (출력값)
+    2
+    3
+
+#### 4.2.3.
