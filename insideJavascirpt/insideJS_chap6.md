@@ -158,3 +158,74 @@ extend()의 기능만 구현한 얕은 복사이다.<br>
 위 상황을 그림으로 나타내면 아래와 같다
 ![6_inheritance3](./img/6_inheritance3.PNG)
 
+\<사실 잘 모르겠다.\>
+
+    var inherit = function (Parent, Child){
+        var F = function (){};
+        return function (Parent, Child){
+            F.prototype = Parent.prototype;
+            Child.prototype = new F();
+            Child.prototype.constructor = Child;
+            Child.super = Parent.prototype;
+        };
+    }();
+
+앞 코드의 클로저는 F()함수를 지속적으로 참조한다. 따라서 F()는 가비지 컬렉션의 대상이 되지 않고 계속 남아있다. 이를 이용하여 F()의 생성은 단 한번 이루어지고 inherit 함수가 계속 호출되어도 F()함수를 계속 생성할 필요가 없다.
+
+## 3. 캡슐화
+캡슐화의 중요한 것은 정보은닉이다.
+
+    var Person = function (arg){
+        var name = arg ? arg : "zzoon";
+
+        this.getName = function(){
+            return name;
+        }
+        this.setName = function (arg){
+            name = arg;
+        }
+    };
+
+    var me = new Person();
+
+이런식으로 선언을 하면 외부에서 _new_ 로 생성한 객체에 접근이 가능하지만 var로 선언된 멤버는 외부에서 접근이 불가능하다.
+<br>
+위 코드를 깔끔하게 다듬으면
+
+    var Person = function(arg){
+        var name = arg ? arg : "zzoon";
+
+        return {
+            getName : function (){
+                return name;
+            }
+            setName : function (arg){
+                name = arg;
+            }
+        }
+    }
+
+Person함수를 호출하여 객체를 반환받으면 Person함수의 프로퍼티에 접근할 수 있는 메소드를 리턴받는다. 하지만 얕은 복사이기 때문에 객체를 반환받는 경우 사용자가 쉽게 변경할 수 있다.
+
+전전 코드에서 사용자가 반환받은 객체는 Person 함수 객체의 프로토타입에는 접근할 수 없다는 단점이 있다(상속을 구현하기 쉽지 않다). 이때문에 객체가 아닌 함수를 반환하는 것이 좋다.
+
+    var Person = function (arg){
+        var name = arg ? arg : "zzoon";
+
+        var Func = function (){}
+        Func.prototype = {
+            this.getName = function(){
+                return name;
+            },
+            this.setName = function (arg){
+                name = arg;
+            }
+        }
+
+        return Func;
+    };
+
+    var me = new Person();
+
+이렇게 클로저를 활용하여 name에 접근할 수 없게 했다.
+
