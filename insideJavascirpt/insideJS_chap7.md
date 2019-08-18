@@ -110,3 +110,8 @@ Function.prototype.apply 함수로 함수를 호출할 수 있다. call과 apply
         }
     }
 
+    var new_func1 = curry(calculate, 1); // 5 (1*2+3 = 5)
+    var new_func2 = curry(calculate, 1, 3); 6 (1*3+3)
+
+![](./img/7_functional_programming1.PNG)
+
