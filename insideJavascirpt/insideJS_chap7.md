@@ -10,7 +10,7 @@
     f1 = encrypt1;
     f2 = encrypt2;
     f3 = encrypt3; 
-    // f1,f2,f3은 입력값이 정해지지않고 서로 다른 암호화 코드이다.
+    // f1,f2,f3은 입력값이 정해지지않고 서로 다른 암호화 코드이다(function).
     pure_value = 'zzoon'; // 암호와할 문자열
     encrypt_value = get_encrypted(x); // get_encrypted(x)는 암호화할 함수를 받아 암호화 후 반환한다. ex) encrypted_value = get_encrypted(f1);
 
