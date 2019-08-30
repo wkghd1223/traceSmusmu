@@ -119,3 +119,131 @@ jQuery의 가장 기본적인 기능은 HTML 문서에서 원하는 DOM객체를
 
 ### 2.1. $("#myDiv") 살펴보기
 $는 jQuery 함수를 참조하기 때문에 _$("#myDiv")_ 는 _jQuery("#myDiv")_ 를 의미한다. jQuery함수에서 첫 번째 인자 a 에는 문자열 "#myDiv", 두 번째 인자 c에는 undefined가 전달된다.
+
+    function jQuery(a, c){
+        ...
+
+        // this 값을 살펴서 현재 jQuery()가 함수 혀애로 호출됐는지를 체크한다.
+        if ( window == this)
+            return new jQuery(a, c);
+            // this가 전역객체 window로 바인딩 되는 경우는 jQuery를 함수형태로 호출하는 경우이다. 예제에서 $("#myDiv")는 함수 호출 형태이므로 this는 전역객체인 window에 바인딩된다. 따라서 new 연산자와 함께 생성자 함수형태로 다시 호출된다. 
+            // 다시 호출된 함수는 함수 호출 패턴에 따라 새로 생성되는 빈 객체에 바인딩 되므로 window가 아니다. 따라서 if문을 실행하지 않고 넘어간다.
+
+        ...   
+
+        this.get (a.constructor == Array || a.length && !a.nodeType && a[0] != undefined && a[0].nodeType ?
+            // Assume that it is an array of DOM Elements
+            jQuery.merge(a, []) :
+
+            // Find the matching elements and save them for later
+            jQuery.find(a, c)
+        );     
+        /*
+        1. a.constructor == Array --> false : '#myDiv'는 문자열 이므로 a.constructor는 문자열이다.
+
+        2. a.length --> true : 문자열이므로 length프로퍼티가 있다. 값은 6
+
+        3. !a.nodeType --> true : a는 문자열이므로 nodeType프로퍼티가 없다. 따라서 undefined값을 가진다 때문에 !a.nodeType은 true값을 가진다. (nodeType은 DOM객체가 가지는 프로퍼티)
+
+        4. a[0] != undefined --> true : a[0]는 '#' 이다. 따라서 true이다.
+
+        5. a[0].nodeType --> false : 문자열은 DOM객체가 아니다.
+
+        종합 : false --> jQuery.find(a, c) 실행 
+        */
+    }
+
+> regexp.exec(string) 메소드<br>
+>정규표현식 객체의 exec(string)메소드는 인자로 받은 string이 자신의 정규표현식에 일치하는 지 체크하고 일치할 경우 배열을 반환한다(일치하지 않을 경우 null반환).
+
+>정규표현식<br>
+>정규 표현식(正規表現式, 영어: regular expression, 간단히 regexp 또는 regex, rational expression) 또는 정규식(正規式)은 특정한 규칙을 가진 문자열의 집합을 표현하는 데 사용하는 형식 언어이다.
+
+#### 2.1.1. jQuery.find(a, c)살펴보기
+_jQuery.find()_ 는 jQuery함수객체 내에 포함된 메소드로서 jQuery의 셀렉터 기능을 처리하는 중요 함수이다.
+
+    find : function (t , context){
+        // Make sure that the context is a DOM Element
+        if (context && context.nodeType == undefined )
+            context = null;
+
+        // Set the correct context (if none is provided)
+        context = context || jQuery.context || document;
+
+        if (t.constructor != String ) return [t];
+
+        if( !t.indexOf("//")){
+            context = context.documentElement;
+            t = t.substr(2, t.length);
+        } else if (!t.indexOf("/")) {
+            context = context.documentElement;
+            t = t.substr(1, t.length);
+            // FIX Assume the root element is right :(
+            if(t.indexOf("/") >= 1)
+                t == t.substr(t.indexOf("/"),t.length);
+        }
+
+        var ret = [context];
+        var done = [];
+        var last = null;
+
+        while (t.length >0 && last != t){
+            var r = [];
+            last = t;
+
+            t = jQuery.trim(t).replace( /^\/\//i, "");
+
+            var foundToken = false;
+
+            for (var i = 0 ; jQuery.token.length ; i += 2){
+                if (foundToken) continue;
+
+                var re = new RegExp("^(" + jQuery.token[i] + ")");
+                var m = re.exec(t);
+
+                if ( m ) {
+                    r = ret = jQuery.map(ret, jQuery.token[i+1]);
+                    t = jQuery.trim(t.replace(re, ""));
+                    
+                    foundToken = true;
+                }
+            }
+            
+            if ( !foundToken ){
+                if (!t.indexOf(",") || !t.indexOf("|")){
+                    if(ret[0] == context ) ret.shift();
+                    done = jQuery.merge( done, ret);
+                    r = ret = [context];
+                    t = " " + t.substr(1, t.length);
+                } else {
+                    var re2 = /^([#.]?)([a-z0-9\\*_-]*)/i;
+                    var m = re2.exec(t);
+
+                    if (m[1] == "#" ){
+                        // Ummm, should make this work in all XML docs
+                        var oid = document.getElementById(m[2]);
+                        r = ret = oid ? [oid] : [];
+                        t = t.replace(re2, "");
+                    } else {
+                        if( !m[2] || m[1] == "." ) m[2] = "*";
+
+                        for (var i = 0 ; i < ret.length; i++)
+                            r = jQuery.merge( r, m[2] == "*" ?
+                                jQuery.getAll(ret[i]) :
+                                ret[i].getElementByTagName(m[2]));
+                    }
+                }
+            }
+
+            if (t) {
+                var val = jQuery.filter(t , r);
+                ret = r = val.r;
+                t = jQuery.trim(val.t);
+            }
+        }
+
+        if (ret && ret[0] == context ) ret.shift();
+        done = jQuery.merge(done, ret);
+
+        return done;
+    }, ...
