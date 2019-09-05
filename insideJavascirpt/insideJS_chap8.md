@@ -166,11 +166,20 @@ _jQuery.find()_ 는 jQuery함수객체 내에 포함된 메소드로서 jQuery�
         // Make sure that the context is a DOM Element
         if (context && context.nodeType == undefined )
             context = null;
+        /*
+        c가 undefined이기 때문에 if문 이하는 실행되지 않는다.
+        */
 
         // Set the correct context (if none is provided)
         context = context || jQuery.context || document;
+        /*
+        context인자의 기본값을 할당한다. context가 undefined면 jQuery.context확인하고 또 undefined면 document를 할당한다.
+        */
 
         if (t.constructor != String ) return [t];
+        /*
+        t는 String이다. 따라서 false
+        */
 
         if( !t.indexOf("//")){
             context = context.documentElement;
@@ -182,6 +191,9 @@ _jQuery.find()_ 는 jQuery함수객체 내에 포함된 메소드로서 jQuery�
             if(t.indexOf("/") >= 1)
                 t == t.substr(t.indexOf("/"),t.length);
         }
+        /*
+        t는 '//' or '/'를 포함지 않기 때문에 indexOf('/')등이 -1 이 반환된다(-1은 true취급이기 때문에 !t.indexOf() 이하가 모두 실행되지 않는다.).
+        */
 
         var ret = [context];
         var done = [];
@@ -192,13 +204,16 @@ _jQuery.find()_ 는 jQuery함수객체 내에 포함된 메소드로서 jQuery�
             last = t;
 
             t = jQuery.trim(t).replace( /^\/\//i, "");
+            /*
+            '/^\/\//i' 이 정규표현식은 문자열이 '//'로 시작하는 지 검사한다. 따라서 t는 //가 있거나 공백이 양끝에 있다면 없어진다.
+            */
 
             var foundToken = false;
 
             for (var i = 0 ; jQuery.token.length ; i += 2){
                 if (foundToken) continue;
 
-                var re = new RegExp("^(" + jQuery.token[i] + ")");
+                var re = new RegExp("^(" + jQuery.token[i] + ")"); // RegExp() 정규표현식 생성함수
                 var m = re.exec(t);
 
                 if ( m ) {
@@ -208,6 +223,9 @@ _jQuery.find()_ 는 jQuery함수객체 내에 포함된 메소드로서 jQuery�
                     foundToken = true;
                 }
             }
+            /*
+            뭔말인지 해석불가
+            */
             
             if ( !foundToken ){
                 if (!t.indexOf(",") || !t.indexOf("|")){
@@ -218,6 +236,12 @@ _jQuery.find()_ 는 jQuery함수객체 내에 포함된 메소드로서 jQuery�
                 } else {
                     var re2 = /^([#.]?)([a-z0-9\\*_-]*)/i;
                     var m = re2.exec(t);
+                    /*
+                    결과 :
+                    m[0] = '#myDiv'
+                    m[1] = '#'
+                    m[2] = 'myDiv'
+                    */
 
                     if (m[1] == "#" ){
                         // Ummm, should make this work in all XML docs
@@ -247,3 +271,32 @@ _jQuery.find()_ 는 jQuery함수객체 내에 포함된 메소드로서 jQuery�
 
         return done;
     }, ...
+    
+    쥰내게 길어서 분석 엄두가 안남
+
+>string.indexOf(searchString)<br>
+>호출한 문자열에서 searchString인자를 검색하고 일치하는 문자열의 첫 번째 인덱스를 반환한다.<br>
+>jQuery.merge(first, second)<br>
+>first와 second배열의 인자를 합친다. 단 중복된 원소는 합쳐지지 않는다(first에 이미 있는 원소가 second에있으면 합쳐지지 않음).<br>
+>$.merge([0,1,2], [2,3,4])
+>--> [0,1,2,3,4]
+
+#### 2.1.2. this.get() 메소드 살펴보기
+jQuery.find() 메소드의 호출 결과가 this.get() 메소드를 호출할 때 인자로 사용된다.
+
+![8_thisBinding](./img/8_thisGet.PNG)
+this는 new 키워드로 생긴 새로생긴 jQuery객체에 바인딩 된다. new로 생성하여 아무 프로퍼티나 메소드가 없는 빈 객체이지만 jQuery.prototype 객체를 자신의 [[Prototype]]링크로 연결하고 있기 때문에 프로토타입 체이닝으로 this.get 메소드가 실행된다(jQuery.prototype.get()).
+
+    get : function (num){
+        if (num && num.constructor == Array ){
+            this.length = 0;
+            [].push.apply(this, num);
+
+            return this;
+        }else{
+            ...
+        }
+    },
+
+this.get()메소드가 호출될 때 num인자로 앞 절에서 살펴본 jQuery.find() 메소드에서 반환된 'myDiv'를 id로 가지는 DOM 객체가 들어있는 배열이 전달된다.
+
